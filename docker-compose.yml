@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: sqli-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword123
+      MYSQL_DATABASE: lab1_sqli
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+      - ./lab1_database.sql:/docker-entrypoint-initdb.d/01-lab1.sql
+      - ./lab2_database.sql:/docker-entrypoint-initdb.d/02-lab2.sql
+      - ./lab3_database.sql:/docker-entrypoint-initdb.d/03-lab3.sql
+    networks:
+      - sqli-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # PHP Apache Web Server
+  web:
+    build: .
+    container_name: sqli-web
+    ports:
+      - "8080:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./lab1_index.php:/var/www/html/lab1/index.php
+      - ./lab2_index.php:/var/www/html/lab2/index.php
+      - ./lab3_index.php:/var/www/html/lab3/index.php
+      - ./main_index.html:/var/www/html/index.html
+    networks:
+      - sqli-network
+
+networks:
+  sqli-network:
+    driver: bridge
+
+volumes:
+  mysql-data:

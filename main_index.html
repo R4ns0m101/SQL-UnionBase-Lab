@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Injection Labs - Practice Environment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 50px;
+        }
+        
+        .labs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .lab-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: 3px solid transparent;
+        }
+        
+        .lab-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        
+        .lab-card.easy {
+            border-color: #28a745;
+        }
+        
+        .lab-card.medium {
+            border-color: #ffc107;
+        }
+        
+        .lab-card.hard {
+            border-color: #dc3545;
+        }
+        
+        .lab-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .lab-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .lab-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .difficulty-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .easy-badge {
+            background: #28a745;
+            color: white;
+        }
+        
+        .medium-badge {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .hard-badge {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .start-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .warning-box h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .warning-box p {
+            color: #856404;
+            line-height: 1.6;
+        }
+        
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .feature-tag {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 SQL Injection Labs</h1>
+            <p>ระบบฝึกหัด Union-based SQL Injection แบบทีละขั้นตอน</p>
+        </div>
+        
+        <div class="content">
+            <div class="warning-box">
+                <h3>⚠️ คำเตือนสำคัญ</h3>
+                <p>
+                    Labs เหล่านี้ถูกสร้างขึ้นเพื่อการศึกษาและฝึกฝนทักษะ Security Testing เท่านั้น
+                    ห้ามนำความรู้ที่ได้ไปใช้กับระบบจริงโดยไม่ได้รับอนุญาต
+                </p>
+            </div>
+            
+            <div class="labs-grid">
+                <!-- Lab 1 -->
+                <div class="lab-card easy">
+                    <div class="lab-number">Lab 1</div>
+                    <div class="difficulty-badge easy-badge">⭐ ระดับง่าย</div>
+                    <div class="lab-title">Basic Union SQL Injection</div>
+                    <div class="lab-description">
+                        เรียนรู้พื้นฐานของ Union-based SQL Injection ตั้งแต่การหา column จนถึงการดึง flag
+                        ไม่มี WAF ง่ายต่อการเริ่มต้น
+                    </div>
+                    <div class="features">
+                        <span class="feature-tag">No WAF</span>
+                        <span class="feature-tag">Error-based</span>
+                        <span class="feature-tag">4 Columns</span>
+                        <span class="feature-tag">Single DB</span>
+                    </div>
+                    <br><br>
+                    <a href="lab1/" class="start-btn">🚀 เริ่มต้น Lab 1</a>
+                </div>
+                
+                <!-- Lab 2 -->
+                <div class="lab-card medium">
+                    <div class="lab-number">Lab 2</div>
+                    <div class="difficulty-badge medium-badge">⭐⭐ ระดับปานกลาง</div>
+                    <div class="lab-title">Intermediate Union with WAF</div>
+                    <div class="lab-description">
+                        ฝึk WAF Bypass techniques เช่น Case Variation และ Comment Injection
+                        มีหลาย tables ต้องสำรวจ
+                    </div>
+                    <div class="features">
+                        <span class="feature-tag">Basic WAF</span>
+                        <span class="feature-tag">Case Bypass</span>
+                        <span class="feature-tag">3 Tables</span>
+                        <span class="feature-tag">Single DB</span>
+                    </div>
+                    <br><br>
+                    <a href="lab2/" class="start-btn">🚀 เริ่มต้น Lab 2</a>
+                </div>
+                
+                <!-- Lab 3 -->
+                <div class="lab-card hard">
+                    <div class="lab-number">Lab 3</div>
+                    <div class="difficulty-badge hard-badge">⭐⭐⭐ ระดับยาก</div>
+                    <div class="lab-title">Advanced Union + Blind SQLi</div>
+                    <div class="lab-description">
+                        Advanced WAF ที่ block เกือบทุกอย่าง ต้องใช้ Hex Encoding, Blind techniques
+                        และ Cross-database queries
+                    </div>
+                    <div class="features">
+                        <span class="feature-tag">Advanced WAF</span>
+                        <span class="feature-tag">Blind SQLi</span>
+                        <span class="feature-tag">Hex Encoding</span>
+                        <span class="feature-tag">2 Databases</span>
+                    </div>
+                    <br><br>
+                    <a href="lab3/" class="start-btn">🚀 เริ่มต้น Lab 3</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
