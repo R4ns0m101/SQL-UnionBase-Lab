@@ -244,10 +244,10 @@ error_reporting(0);
                         
                         while($row = $result->fetch_assoc()) {
                             echo '<tr>';
-                            echo '<td>'.$row['id'].'</td>';
-                            echo '<td>'.$row['name'].'</td>';
+                            echo '<td>'.htmlspecialchars($row['id']).'</td>';
+                            echo '<td>'.htmlspecialchars($row['name']).'</td>';
                             echo '<td>'.number_format($row['price'], 2).'</td>';
-                            echo '<td>'.$row['description'].'</td>';
+                            echo '<td>'.htmlspecialchars($row['description']).'</td>';
                             echo '</tr>';
                         }
                         echo '</table>';

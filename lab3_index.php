@@ -2,38 +2,47 @@
 error_reporting(0);
 ini_set('display_errors', 0);
 
-// Advanced WAF - filter หลายคำและ pattern
+// Advanced WAF - keyword removal + hard blocks
+// Bypass: Double-write technique (e.g., UNUNIONION -> after removal -> UNION)
 function advanced_waf($input) {
-    $blacklist = array(
-        // SQL Keywords
-        'UNION', 'SELECT', 'WHERE', 'FROM', 'INSERT', 'UPDATE', 'DELETE',
-        'DROP', 'CREATE', 'ALTER', 'EXEC', 'EXECUTE',
-        // Information Schema
-        'INFORMATION_SCHEMA', 'TABLE_SCHEMA', 'TABLE_NAME', 
-        'COLUMN_NAME', 'COLUMNS', 'TABLES',
-        // Functions
-        'CONCAT', 'GROUP_CONCAT', 'SUBSTRING', 'CHAR', 'ASCII',
-        // Comment styles
-        '--', '#', '/*', '*/',
-        // Special chars
-        ';', '||', '&&'
-    );
-    
-    $input_upper = strtoupper($input);
-    
-    foreach($blacklist as $word) {
-        if(strpos($input_upper, strtoupper($word)) !== false) {
-            error_log("WAF blocked: " . $input);
+    // Phase 1: Hard blocks - completely blocked, no bypass
+    $hard_blocks = array('--', '#', '/*', '*/', ';');
+
+    foreach($hard_blocks as $block) {
+        if(strpos($input, $block) !== false) {
+            error_log("WAF hard-blocked: " . $input);
             return false;
         }
     }
-    
-    // Pattern matching
-    if(preg_match('/\b(and|or)\b.*[=<>]/i', $input)) {
+
+    // Phase 2: Block common boolean injection patterns (e.g., OR 1=1, AND 1=1)
+    if(preg_match('/\b(and|or)\b\s+[\d\'\"]+\s*[=<>]\s*[\d\'\"]+/i', $input)) {
+        error_log("WAF pattern-blocked: " . $input);
         return false;
     }
-    
-    return true;
+
+    // Phase 3: Keyword removal - removes SQL keywords from input
+    // Can be bypassed with double-write: UNUNIONION -> UNION after removal
+    $remove_keywords = array(
+        // Compound keywords first (prevent partial removal conflicts)
+        'INFORMATION_SCHEMA', 'TABLE_SCHEMA', 'TABLE_NAME',
+        'COLUMN_NAME', 'GROUP_CONCAT',
+        // SQL Keywords
+        'UNION', 'SELECT', 'WHERE', 'FROM',
+        'INSERT', 'UPDATE', 'DELETE', 'DROP',
+        'CREATE', 'ALTER', 'EXECUTE', 'EXEC',
+        // Schema keywords
+        'COLUMNS', 'TABLES',
+        // Functions
+        'CONCAT', 'SUBSTRING', 'CHAR', 'ASCII'
+    );
+
+    $filtered = $input;
+    foreach($remove_keywords as $word) {
+        $filtered = preg_replace('/' . preg_quote($word, '/') . '/i', '', $filtered);
+    }
+
+    return $filtered;
 }
 
 function safe_output($text) {
@@ -294,23 +303,26 @@ function safe_output($text) {
             <?php
             if(isset($_GET['id'])) {
                 $id = $_GET['id'];
-                
+
                 // ตรวจสอบ Advanced WAF
-                if(!advanced_waf($id)) {
+                $waf_result = advanced_waf($id);
+                if($waf_result === false) {
                     echo '<div class="alert alert-danger">';
                     echo '🚨 <strong>SECURITY ALERT!</strong> Malicious pattern detected and blocked by Advanced WAF.<br>';
                     echo '<small>Incident has been logged and security team notified.</small>';
                     echo '</div>';
                 } else {
+                    // Use WAF-filtered input (keywords removed)
+                    $id = $waf_result;
                     $conn = new mysqli("mysql", "webapp3", "webapp3complex!", "lab3_ecommerce");
-                    
+
                     if ($conn->connect_error) {
                         echo '<div class="alert alert-danger">System error. Please try again later.</div>';
                     } else {
                         // Vulnerable query - แต่ไม่แสดง error message
                         $query = "SELECT order_id, customer_name, product_name, total_price FROM orders WHERE order_id = $id";
                         $result = @$conn->query($query);
-                        
+
                         // Blind-like behavior - ไม่แสดง error
                         if($result && $result->num_rows > 0) {
                             echo '<div class="alert alert-info">';
@@ -318,7 +330,7 @@ function safe_output($text) {
                             echo '</div>';
                             echo '<table>';
                             echo '<tr><th>Order ID</th><th>Customer</th><th>Product</th><th>Price (THB)</th></tr>';
-                            
+
                             while($row = $result->fetch_assoc()) {
                                 echo '<tr>';
                                 echo '<td>'.safe_output($row['order_id']).'</td>';
@@ -334,7 +346,7 @@ function safe_output($text) {
                             echo 'ℹ️ No results found.';
                             echo '</div>';
                         }
-                        
+
                         $conn->close();
                     }
                 }
@@ -344,8 +356,10 @@ function safe_output($text) {
             <div class="hints-box">
                 <h3>💡 Advanced Challenge Hints:</h3>
                 <ul>
-                    <li><strong>WAF Bypass:</strong> Advanced WAF blocks UNION, SELECT, WHERE, FROM, INFORMATION_SCHEMA และอื่นๆ อีกมาก</li>
-                    <li><strong>Error Suppression:</strong> Application ไม่แสดง SQL errors ทำให้ต้องใช้ Blind techniques</li>
+                    <li><strong>WAF Behavior:</strong> WAF ของ Lab นี้ไม่ได้แค่ "block" แต่จะ "ลบ" SQL keywords ออกจาก input ลองสังเกตความแตกต่าง</li>
+                    <li><strong>Double-Write Technique:</strong> ถ้า WAF ลบ UNION ออก ลองใส่ <code>UNUNIONION</code> หลังลบจะเหลือ <code>UNION</code></li>
+                    <li><strong>Hard Blocks:</strong> WAF จะ block comments (<code>--</code>, <code>#</code>, <code>/*</code>) และ semicolons (<code>;</code>) อย่างเด็ดขาด</li>
+                    <li><strong>Error Suppression:</strong> Application ไม่แสดง SQL errors ต้องสังเกตจาก response ว่ามีข้อมูลหรือไม่</li>
                     <li><strong>Multiple Databases:</strong> มี 2 databases:
                         <ul style="margin-left: 20px; margin-top: 5px;">
                             <li><code>lab3_ecommerce</code> - orders, payment_methods</li>
@@ -353,18 +367,17 @@ function safe_output($text) {
                         </ul>
                     </li>
                     <li><strong>Target:</strong> Flag อยู่ใน <code>lab3_internal.confidential_files</code></li>
-                    <li><strong>Techniques:</strong> 
+                    <li><strong>Techniques:</strong>
                         <ul style="margin-left: 20px; margin-top: 5px;">
-                            <li>Hex Encoding: <code>0x6c616233</code> = "lab3"</li>
-                            <li>Boolean Blind: <code>EXISTS</code>, <code>IN</code>, <code>CASE WHEN</code></li>
-                            <li>Time-based: <code>SLEEP()</code>, <code>BENCHMARK()</code></li>
-                            <li>Subquery Injection</li>
+                            <li>Double-write: <code>SESELECTLECT</code>, <code>FRFROMOM</code>, <code>WHWHEREERE</code></li>
+                            <li>Hex Encoding for strings: <code>0x6c6162335f696e7465726e616c</code> = "lab3_internal"</li>
+                            <li>Cross-database query: <code>db_name.table_name</code></li>
                         </ul>
                     </li>
                 </ul>
-                
+
                 <div class="flag-hint">
-                    🏁 Ultimate Goal: Bypass Advanced WAF → Access lab3_internal → Extract flag from confidential_files
+                    🏁 Ultimate Goal: Discover WAF behavior → Double-write bypass → Cross-DB query → Extract flag from confidential_files
                 </div>
             </div>
         </div>

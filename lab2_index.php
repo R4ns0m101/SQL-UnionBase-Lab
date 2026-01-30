@@ -1,15 +1,18 @@
 <?php
 error_reporting(0);
 
-// Basic WAF - filter บางคำ
+// Basic WAF - filter exact uppercase and lowercase keywords only
+// Bypass: Use mixed case like UnIoN, SeLeCt or comment injection like UN/**/ION
 function basic_waf($input) {
     $blacklist = array(
-        'UNION', 'SELECT', 'WHERE', 'FROM', 
-        'INFORMATION_SCHEMA', 'TABLE', 'COLUMN'
+        'UNION', 'SELECT', 'WHERE', 'FROM',
+        'INFORMATION_SCHEMA', 'TABLE', 'COLUMN',
+        'union', 'select', 'where', 'from',
+        'information_schema', 'table', 'column'
     );
-    
+
     foreach($blacklist as $word) {
-        if(stripos($input, $word) !== false) {
+        if(strpos($input, $word) !== false) {
             return false;
         }
     }
@@ -286,10 +289,10 @@ function basic_waf($input) {
                             
                             while($row = $result->fetch_assoc()) {
                                 echo '<tr>';
-                                echo '<td>'.$row['id'].'</td>';
-                                echo '<td>'.$row['name'].'</td>';
-                                echo '<td>'.$row['email'].'</td>';
-                                echo '<td>'.$row['phone'].'</td>';
+                                echo '<td>'.htmlspecialchars($row['id']).'</td>';
+                                echo '<td>'.htmlspecialchars($row['name']).'</td>';
+                                echo '<td>'.htmlspecialchars($row['email']).'</td>';
+                                echo '<td>'.htmlspecialchars($row['phone']).'</td>';
                                 echo '</tr>';
                             }
                             echo '</table>';

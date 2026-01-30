@@ -1,46 +1,46 @@
--- Lab 2: Intermediate Union-based SQL Injection with WAF
+-- =============================================
+-- Lab 2: Intermediate Union SQL Injection
 -- Database: lab2_sqli
+-- Difficulty: Medium (Basic WAF - case-sensitive)
+-- =============================================
 
 CREATE DATABASE IF NOT EXISTS lab2_sqli;
 USE lab2_sqli;
 
--- ตาราง customers
-CREATE TABLE IF NOT EXISTS customers (
+-- Customers table (visible to users)
+CREATE TABLE customers (
     id INT PRIMARY KEY,
     name VARCHAR(100),
     email VARCHAR(100),
     phone VARCHAR(20)
 );
 
-INSERT INTO customers (id, name, email, phone) VALUES
-(1, 'สมชาย ใจดี', 'somchai@email.com', '081-234-5678'),
-(2, 'สมหญิง รักสวย', 'somying@email.com', '082-345-6789'),
-(3, 'ประยุทธ์ มั่นคง', 'prayut@email.com', '083-456-7890'),
-(4, 'สุดารัตน์ สวยงาม', 'sudarat@email.com', '084-567-8901');
+INSERT INTO customers VALUES
+(1, 'Somchai Jaidi', 'somchai@email.com', '081-234-5678'),
+(2, 'Somying Rakrien', 'somying@email.com', '089-876-5432'),
+(3, 'Wichai Kengmak', 'wichai@email.com', '062-345-6789'),
+(4, 'Nida Suayngam', 'nida@email.com', '095-111-2222');
 
--- ตาราง admin_users
-CREATE TABLE IF NOT EXISTS admin_users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+-- Admin users table (hidden)
+CREATE TABLE admin_users (
+    id INT PRIMARY KEY,
     username VARCHAR(50),
     password VARCHAR(100),
-    level VARCHAR(20)
+    role VARCHAR(20)
 );
 
-INSERT INTO admin_users (username, password, level) VALUES
-('superadmin', 'super_secret_2024', 'super'),
-('moderator', 'mod_pass_456', 'moderate'),
-('support', 'support_789', 'basic');
+INSERT INTO admin_users VALUES
+(1, 'admin', 'Sup3r$ecretP@ss', 'administrator'),
+(2, 'moderator', 'M0d#Pass2024', 'moderator');
 
--- ตาราง secret_data ที่มี FLAG
-CREATE TABLE IF NOT EXISTS secret_data (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    data_type VARCHAR(50),
-    secret_value TEXT,
-    created_date DATE
+-- Secret data table (target - contains flag)
+CREATE TABLE secret_data (
+    id INT PRIMARY KEY,
+    secret_key VARCHAR(100),
+    secret_value VARCHAR(200)
 );
 
-INSERT INTO secret_data (data_type, secret_value, created_date) VALUES
-('api_key', 'sk_test_abc123xyz789', '2024-01-10'),
-('master_password', 'admin_master_2024', '2024-01-11'),
-('flag', 'FLAG{W4F_BYP4SS_C4S3_V4R14T10N}', '2024-01-12'),
-('encryption_key', 'aes256_key_secret', '2024-01-13');
+INSERT INTO secret_data VALUES
+(1, 'api_key', 'sk-test-xxxx-yyyy-zzzz'),
+(2, 'flag', 'FLAG{WAF_Byp4ss_C4s3_Var1at10n}'),
+(3, 'encryption_key', 'AES-256-CBC-key-do-not-share');

@@ -1,61 +1,75 @@
--- Lab 3: Advanced Union-based SQL Injection with Advanced WAF
--- Databases: lab3_ecommerce และ lab3_internal
+-- =============================================
+-- Lab 3: Advanced Union SQL Injection
+-- Databases: lab3_ecommerce + lab3_internal
+-- Difficulty: Hard (Advanced WAF - keyword removal)
+-- =============================================
 
+-- =========================
 -- Database 1: lab3_ecommerce
+-- =========================
 CREATE DATABASE IF NOT EXISTS lab3_ecommerce;
 USE lab3_ecommerce;
 
-CREATE TABLE IF NOT EXISTS orders (
+-- Orders table (visible to users)
+CREATE TABLE orders (
     order_id INT PRIMARY KEY,
     customer_name VARCHAR(100),
     product_name VARCHAR(100),
-    total_price DECIMAL(10, 2)
+    total_price DECIMAL(10,2)
 );
 
-INSERT INTO orders (order_id, customer_name, product_name, total_price) VALUES
-(1, 'วิชัย ประกอบธุรกิจ', 'MacBook Pro M3', 89900.00),
-(2, 'นิภา สมบูรณ์', 'Sony WH-1000XM5', 13900.00),
-(3, 'ธนากร รวยเงิน', 'Samsung QLED TV 65"', 45900.00),
-(4, 'พรทิพย์ มีสุข', 'Nintendo Switch OLED', 12900.00),
-(5, 'อนันต์ ชาญชัย', 'Canon EOS R6', 79900.00);
+INSERT INTO orders VALUES
+(1, 'Alice Johnson', 'MacBook Pro 16 inch', 89900.00),
+(2, 'Bob Smith', 'iPhone 15 Pro Max', 52900.00),
+(3, 'Charlie Brown', 'iPad Air M2', 27900.00),
+(4, 'Diana Prince', 'Apple Watch Ultra', 31900.00),
+(5, 'Eve Williams', 'AirPods Pro 2', 8990.00);
 
-CREATE TABLE IF NOT EXISTS payment_methods (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    method_name VARCHAR(50),
-    is_active BOOLEAN
+-- Payment methods table (hidden)
+CREATE TABLE payment_methods (
+    id INT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    card_type VARCHAR(20),
+    card_last_four VARCHAR(4)
 );
 
-INSERT INTO payment_methods (method_name, is_active) VALUES
-('Credit Card', TRUE),
-('Bank Transfer', TRUE),
-('Cash on Delivery', TRUE),
-('E-Wallet', TRUE);
+INSERT INTO payment_methods VALUES
+(1, 'Alice Johnson', 'VISA', '4321'),
+(2, 'Bob Smith', 'Mastercard', '8765'),
+(3, 'Charlie Brown', 'AMEX', '1234'),
+(4, 'Diana Prince', 'VISA', '5678'),
+(5, 'Eve Williams', 'Mastercard', '9012');
 
+-- =========================
 -- Database 2: lab3_internal
+-- =========================
 CREATE DATABASE IF NOT EXISTS lab3_internal;
 USE lab3_internal;
 
-CREATE TABLE IF NOT EXISTS confidential_files (
-    file_id INT PRIMARY KEY AUTO_INCREMENT,
-    file_name VARCHAR(100),
-    file_content TEXT,
+-- Confidential files table (target - contains flag)
+CREATE TABLE confidential_files (
+    id INT PRIMARY KEY,
+    filename VARCHAR(100),
+    content TEXT,
     classification VARCHAR(20)
 );
 
-INSERT INTO confidential_files (file_name, file_content, classification) VALUES
-('company_strategy.pdf', 'Q1 2024 Business Strategy...', 'CONFIDENTIAL'),
-('employee_salaries.xlsx', 'Salary data for 2024...', 'RESTRICTED'),
-('flag.txt', 'FLAG{4DV4NC3D_BL1ND_SQL1_H3X_M4ST3R}', 'TOP_SECRET'),
-('api_credentials.json', 'API Keys and Secrets...', 'SECRET');
+INSERT INTO confidential_files VALUES
+(1, 'employee_data.xlsx', 'Contains all employee personal information', 'RESTRICTED'),
+(2, 'financial_report.pdf', 'Q4 2024 financial statements', 'CONFIDENTIAL'),
+(3, 'flag.txt', 'FLAG{Adv4nc3d_WAF_Byp4ss_D0uble_Wr1te}', 'TOP SECRET'),
+(4, 'network_diagram.png', 'Internal network architecture', 'RESTRICTED');
 
-CREATE TABLE IF NOT EXISTS system_credentials (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    system_name VARCHAR(50),
+-- System credentials table (hidden)
+CREATE TABLE system_credentials (
+    id INT PRIMARY KEY,
+    service VARCHAR(50),
     username VARCHAR(50),
     password VARCHAR(100)
 );
 
-INSERT INTO system_credentials (system_name, username, password) VALUES
-('production_db', 'db_admin', 'P@ssw0rd_Pr0d_2024'),
-('backup_server', 'backup_user', 'B4ckup_S3cr3t!'),
-('monitoring', 'monitor_admin', 'M0n1t0r_K3y#2024');
+INSERT INTO system_credentials VALUES
+(1, 'Production DB', 'db_admin', 'Pr0d#DB@dmin2024!'),
+(2, 'AWS Console', 'cloud_admin', 'Cl0ud$ecure!'),
+(3, 'VPN Gateway', 'vpn_admin', 'VPN@cc3ss#Key'),
+(4, 'Email Server', 'mail_admin', 'M@il$3rver2024');
