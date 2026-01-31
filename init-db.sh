@@ -12,11 +12,6 @@ mysql -u root -p"${MYSQL_ROOT_PASSWORD}" <<-EOSQL
     CREATE USER IF NOT EXISTS 'webapp2'@'%' IDENTIFIED BY 'webapp2secure';
     GRANT ALL PRIVILEGES ON lab2_sqli.* TO 'webapp2'@'%';
 
-    -- Lab 3 User
-    CREATE USER IF NOT EXISTS 'webapp3'@'%' IDENTIFIED BY 'webapp3complex!';
-    GRANT ALL PRIVILEGES ON lab3_ecommerce.* TO 'webapp3'@'%';
-    GRANT ALL PRIVILEGES ON lab3_internal.* TO 'webapp3'@'%';
-
     FLUSH PRIVILEGES;
 EOSQL
 

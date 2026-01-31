@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker-compose up:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker-compose down:*)",
+      "Bash(powershell -Command \"\\(Get-Content ''C:\\\\Users\\\\pkhyo\\\\SQL-UnionBase-Lab\\\\init-db.sh'' -Raw\\) -match ''\\\\r\\\\n''\")",
+      "Bash(powershell -NoProfile -Command \"& { $f=''C:\\\\Users\\\\pkhyo\\\\SQL-UnionBase-Lab\\\\init-db.sh''; $c=[IO.File]::ReadAllText\\($f\\); $c=$c.Replace\\([char]13+[char]10,[char]10\\); [IO.File]::WriteAllBytes\\($f,[Text.Encoding]::UTF8.GetBytes\\($c\\)\\) }\")",
+      "Bash(python:*)",
+      "Bash(curl:*)",
+      "Bash(wc:*)",
+      "Bash(du:*)",
+      "Bash(powershell.exe -Command \"& { \\(Get-Content -Path ''C:\\\\Users\\\\pkhyo\\\\SQL-UnionBase-Lab\\\\init-db.sh'' -Raw\\) -replace [char]13+[char]10,[char]10 | Set-Content -Path ''C:\\\\Users\\\\pkhyo\\\\SQL-UnionBase-Lab\\\\init-db.sh'' -NoNewline -Encoding UTF8 }\")",
+      "Bash(powershell.exe -Command \"& { $content = [System.IO.File]::ReadAllText\\(''C:\\\\Users\\\\pkhyo\\\\SQL-UnionBase-Lab\\\\init-db.sh''\\); $content = $content -replace [char]13,''''; $utf8NoBom = New-Object System.Text.UTF8Encoding\\($false\\); [System.IO.File]::WriteAllText\\(''C:\\\\Users\\\\pkhyo\\\\SQL-UnionBase-Lab\\\\init-db.sh'', $content, $utf8NoBom\\) }\")",
+      "Bash(powershell.exe:*)",
+      "Bash(ls:*)"
+    ]
+  }
+}

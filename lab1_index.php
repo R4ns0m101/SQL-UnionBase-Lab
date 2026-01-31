@@ -246,7 +246,7 @@ error_reporting(0);
                             echo '<tr>';
                             echo '<td>'.htmlspecialchars($row['id']).'</td>';
                             echo '<td>'.htmlspecialchars($row['name']).'</td>';
-                            echo '<td>'.number_format($row['price'], 2).'</td>';
+                            echo '<td>'.htmlspecialchars($row['price']).'</td>';
                             echo '<td>'.htmlspecialchars($row['description']).'</td>';
                             echo '</tr>';
                         }

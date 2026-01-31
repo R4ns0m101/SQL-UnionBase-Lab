@@ -15,7 +15,6 @@ services:
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
       - ./lab1_database.sql:/docker-entrypoint-initdb.d/01-lab1.sql
       - ./lab2_database.sql:/docker-entrypoint-initdb.d/02-lab2.sql
-      - ./lab3_database.sql:/docker-entrypoint-initdb.d/03-lab3.sql
     networks:
       - sqli-network
     healthcheck:
@@ -35,7 +34,6 @@ services:
     volumes:
       - ./lab1_index.php:/var/www/html/lab1/index.php
       - ./lab2_index.php:/var/www/html/lab2/index.php
-      - ./lab3_index.php:/var/www/html/lab3/index.php
       - ./main_index.html:/var/www/html/index.html
     networks:
       - sqli-network

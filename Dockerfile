@@ -12,7 +12,6 @@ WORKDIR /var/www/html
 # Copy PHP files
 COPY lab1_index.php /var/www/html/lab1/index.php
 COPY lab2_index.php /var/www/html/lab2/index.php
-COPY lab3_index.php /var/www/html/lab3/index.php
 COPY main_index.html /var/www/html/index.html
 
 # Set permissions
