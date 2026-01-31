@@ -9,7 +9,7 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword123
       MYSQL_DATABASE: lab1_sqli
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
@@ -27,7 +27,7 @@ services:
     build: .
     container_name: sqli-web
     ports:
-      - "8080:80"
+      - "9090:80"
     depends_on:
       mysql:
         condition: service_healthy
